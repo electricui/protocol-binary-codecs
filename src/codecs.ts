@@ -35,7 +35,7 @@ export class CharCodec extends Codec {
       const split = splitBuffer(message.payload, Buffer.from([0x00]))
 
       // take the buffer up until the first 0x00
-      message.payload = split[0]
+      message.payload = split[0].toString('utf8')
       return push(message)
     }
 
