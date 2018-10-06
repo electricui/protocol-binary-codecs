@@ -1,3 +1,1 @@
-import { defaultCodecList, defaultCodecMap } from './src/codecs'
-
-export { defaultCodecList, defaultCodecMap }
+export { defaultCodecList, defaultCodecMap } from './src/codecs'
