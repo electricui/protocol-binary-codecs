@@ -323,6 +323,13 @@ export class MessageIDListCodec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // If there's none, just pass an empty array of strings
+    if (message.payload === null) {
+      message.payload = [] as string[]
+
+      return push(message)
+    }
+
     const split = splitBuffer(message.payload, Buffer.from([0x00]))
 
     // grab the string representations
