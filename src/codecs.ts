@@ -9,6 +9,12 @@ export class CharCodec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     if (Array.isArray(message.payload)) {
       const bufs = []
 
@@ -30,6 +36,11 @@ export class CharCodec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     // if it's null terminated
     if (message.payload.includes(0x00)) {
       const split = splitBuffer(message.payload, Buffer.from([0x00]))
@@ -51,6 +62,12 @@ export class Int8Codec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Int8Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -60,6 +77,11 @@ export class Int8Codec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Int8Array(
         message.payload.buffer,
@@ -79,6 +101,12 @@ export class Uint8Codec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Uint8Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -88,6 +116,11 @@ export class Uint8Codec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Uint8Array(
         message.payload.buffer,
@@ -107,6 +140,12 @@ export class Int16Codec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Int16Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -116,6 +155,11 @@ export class Int16Codec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Int16Array(
         message.payload.buffer,
@@ -135,6 +179,12 @@ export class Uint16Codec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Uint16Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -144,6 +194,11 @@ export class Uint16Codec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Uint16Array(
         message.payload.buffer,
@@ -163,6 +218,12 @@ export class Int32Codec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Int32Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -172,6 +233,11 @@ export class Int32Codec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Int32Array(
         message.payload.buffer,
@@ -191,6 +257,12 @@ export class Uint32Codec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Uint32Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -200,6 +272,11 @@ export class Uint32Codec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Uint32Array(
         message.payload.buffer,
@@ -219,6 +296,12 @@ export class FloatCodec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Float32Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -228,6 +311,11 @@ export class FloatCodec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Float32Array(
         message.payload.buffer,
@@ -247,6 +335,12 @@ export class DoubleCodec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     message.payload = Buffer.from(
       Float64Array.from(
         Array.isArray(message.payload) ? message.payload : [message.payload],
@@ -256,6 +350,11 @@ export class DoubleCodec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Float64Array(
         message.payload.buffer,
@@ -275,6 +374,12 @@ export class OffsetMetadataCodec extends Codec {
   }
 
   encode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     if (Buffer.isBuffer(message.payload)) {
       return push(message)
     }
@@ -286,6 +391,11 @@ export class OffsetMetadataCodec extends Codec {
   }
 
   decode(message: Message, push: PushCallback) {
+    // The null case
+    if (message.payload === null) {
+      return push(message)
+    }
+
     const arr = Array.from(
       new Uint16Array(
         message.payload.buffer,
