@@ -39,6 +39,45 @@ const decoderFactory = (encoderKey: string, input: Buffer, output: any) => {
   }
 }
 
+describe('default encoders with null payloads', () => {
+  it(
+    'correctly encodes the null case for a char',
+    encoderFactory('char', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a int8',
+    encoderFactory('int8', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a uint8',
+    encoderFactory('uint8', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a int16',
+    encoderFactory('int16', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a uint16',
+    encoderFactory('uint16', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a int32',
+    encoderFactory('int32', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a uint32',
+    encoderFactory('uint32', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a float',
+    encoderFactory('float', null, Buffer.alloc(0)),
+  )
+  it(
+    'correctly encodes the null case for a double',
+    encoderFactory('double', null, Buffer.alloc(0)),
+  )
+})
+
 describe('defaultEncoders', () => {
   it(
     'correctly encodes a single char',
