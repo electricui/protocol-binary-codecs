@@ -417,8 +417,7 @@ export class MessageIDListCodec extends Codec {
     if (
       message.metadata.internal &&
       message.metadata.type === TYPES.CUSTOM_MARKER &&
-      (message.messageID === MESSAGEIDS.READONLY_MESSAGEIDS_ITEM ||
-        message.messageID === MESSAGEIDS.READWRITE_MESSAGEIDS_ITEM)
+      message.messageID === MESSAGEIDS.READWRITE_MESSAGEIDS_ITEM
     ) {
       return true
     }
