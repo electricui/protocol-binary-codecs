@@ -15,6 +15,12 @@ export class CharCodec extends Codec {
       return push(message)
     }
 
+    // The zero length buffer case
+    if (Buffer.isBuffer(message.payload) && message.payload.length === 0) {
+      message.payload = Buffer.alloc(0)
+      return push(message)
+    }
+
     if (Array.isArray(message.payload)) {
       const bufs = []
 
@@ -27,11 +33,21 @@ export class CharCodec extends Codec {
       return push(message)
     }
 
-    // Otherwise null terminate the string and send it
-    message.payload = Buffer.concat([
-      Buffer.from(message.payload),
-      Buffer.from([0x00]),
-    ])
+    if (typeof message.payload === 'string') {
+      // Otherwise null terminate the string and send it
+      message.payload = Buffer.concat([
+        Buffer.from(message.payload),
+        Buffer.from([0x00]),
+      ])
+      return push(message)
+    }
+
+    throw new Error(
+      `The type of this message ${
+        message.messageID
+      } payload is incorrect, ${typeof message.payload}`,
+    )
+
     return push(message)
   }
 
