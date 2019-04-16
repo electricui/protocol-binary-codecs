@@ -1,1 +1,15 @@
-export { defaultCodecList, defaultCodecMap } from './src/codecs'
+export {
+  defaultCodecList,
+  defaultCodecMap,
+  CharCodec,
+  Int8Codec,
+  Uint8Codec,
+  Int16Codec,
+  Uint16Codec,
+  Int32Codec,
+  Uint32Codec,
+  FloatCodec,
+  DoubleCodec,
+  OffsetMetadataCodec,
+  MessageIDListCodec,
+} from './src/codecs'
