@@ -532,6 +532,23 @@ export class MessageIDListCodec extends Codec {
   }
 }
 
+export class CallbackCodec extends Codec {
+  filter(message: Message): boolean {
+    return message.metadata.type === TYPES.CALLBACK
+  }
+
+  encode(message: Message, push: PushCallback) {
+    // Always ignore the payload when sending a callback
+    return nullCaseEncode(message, push)
+  }
+
+  decode(message: Message, push: PushCallback) {
+    // Always set the payload to null
+    message.payload = null
+    return push(message)
+  }
+}
+
 declare interface CodecMap {
   [key: string]: Codec
 }
@@ -548,6 +565,7 @@ const defaultCodecMap: CodecMap = {
   double: new DoubleCodec(),
   offsetMetadata: new OffsetMetadataCodec(),
   msgIdList: new MessageIDListCodec(),
+  callback: new CallbackCodec(),
 }
 
 const defaultCodecList = Object.values(defaultCodecMap) as Array<Codec>
