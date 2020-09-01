@@ -3,9 +3,11 @@ import { MESSAGEIDS, TYPES } from '@electricui/protocol-binary-constants'
 
 import { splitBuffer } from './utils'
 
-function nullCaseEncode(message: Message, push: PushCallback) {
-  message.payload = Buffer.alloc(0)
-  return push(message)
+const nullBuffer = Buffer.alloc(0)
+
+function nullCaseEncode(message: Message) {
+  message.payload = nullBuffer
+  return message
 }
 
 function isNumberOrArrayOfNumbers(payload: any) {
@@ -28,8 +30,7 @@ export class CharCodec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      message.payload = Buffer.alloc(0)
-      return push(message)
+      return push(nullCaseEncode(message))
     }
 
     // The zero length buffer case
@@ -97,7 +98,7 @@ export class Int8Codec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -142,7 +143,7 @@ export class Uint8Codec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -187,7 +188,7 @@ export class Int16Codec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -232,7 +233,7 @@ export class Uint16Codec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -277,7 +278,7 @@ export class Int32Codec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -322,7 +323,7 @@ export class Uint32Codec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -367,7 +368,7 @@ export class FloatCodec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -412,7 +413,7 @@ export class DoubleCodec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     // Assert the payload is null, a number, or an array of numbers
@@ -457,7 +458,7 @@ export class OffsetMetadataCodec extends Codec {
   encode(message: Message, push: PushCallback) {
     // The null case
     if (message.payload === null) {
-      return nullCaseEncode(message, push)
+      return push(nullCaseEncode(message))
     }
 
     if (Buffer.isBuffer(message.payload)) {
@@ -539,7 +540,7 @@ export class CallbackCodec extends Codec {
 
   encode(message: Message, push: PushCallback) {
     // Always ignore the payload when sending a callback
-    return nullCaseEncode(message, push)
+    return push(nullCaseEncode(message))
   }
 
   decode(message: Message, push: PushCallback) {
