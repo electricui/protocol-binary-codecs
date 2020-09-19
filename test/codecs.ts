@@ -4,7 +4,6 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 
 import { Message } from '@electricui/core'
-
 import { defaultCodecMap } from '../src/codecs'
 
 const assert = chai.assert
@@ -12,304 +11,114 @@ const assert = chai.assert
 const encoderFactory = (encoderKey: string, input: any, output: Buffer) => {
   return () => {
     const transform = defaultCodecMap[encoderKey].encode
-
-    const message = new Message('test', input)
-    const spy = sinon.spy()
-
-    transform(message, spy)
-    const outputMessage = spy.getCall(0).args[0]
-
-    assert.isTrue(spy.called)
-    assert.deepEqual(outputMessage.payload, output)
+    assert.deepEqual(transform(input), output)
   }
 }
 
 const decoderFactory = (encoderKey: string, input: Buffer, output: any) => {
   return () => {
     const transform = defaultCodecMap[encoderKey].decode
-
-    const message = new Message('test', input)
-    const spy = sinon.spy()
-
-    transform(message, spy)
-    const outputMessage = spy.getCall(0).args[0]
-
-    assert.isTrue(spy.called)
-    assert.deepEqual(outputMessage.payload, output)
+    assert.deepEqual(transform(input), output)
   }
 }
 
 describe('default encoders with null payloads', () => {
-  it(
-    'correctly encodes the null case for a char',
-    encoderFactory('char', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a int8',
-    encoderFactory('int8', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a uint8',
-    encoderFactory('uint8', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a int16',
-    encoderFactory('int16', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a uint16',
-    encoderFactory('uint16', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a int32',
-    encoderFactory('int32', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a uint32',
-    encoderFactory('uint32', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a float',
-    encoderFactory('float', null, Buffer.alloc(0)),
-  )
-  it(
-    'correctly encodes the null case for a double',
-    encoderFactory('double', null, Buffer.alloc(0)),
-  )
+  it('correctly encodes the null case', encoderFactory('null', null, Buffer.alloc(0)))
 })
 
 describe('defaultEncoders', () => {
-  it(
-    'correctly encodes a single char',
-    encoderFactory('char', 'e', Buffer.from([0x65, 0x00])),
-  )
-  it(
-    'correctly encodes a single int8',
-    encoderFactory('int8', -1, Buffer.from([0xff])),
-  )
-  it(
-    'correctly encodes a single uint8',
-    encoderFactory('uint8', 255, Buffer.from([0xff])),
-  )
-  it(
-    'correctly encodes a single int16',
-    encoderFactory('int16', -1, Buffer.from([0xff, 0xff])),
-  )
-  it(
-    'correctly encodes a single uint16',
-    encoderFactory('uint16', 65535, Buffer.from([0xff, 0xff])),
-  )
-  it(
-    'correctly encodes a single int32',
-    encoderFactory('int32', -1, Buffer.from([0xff, 0xff, 0xff, 0xff])),
-  )
-  it(
-    'correctly encodes a single uint32',
-    encoderFactory('uint32', 4294967295, Buffer.from([0xff, 0xff, 0xff, 0xff])),
-  )
-  it(
-    'correctly encodes a single float',
-    encoderFactory('float', 12.5, Buffer.from([0x00, 0x00, 0x48, 0x41])),
-  )
+  it('correctly encodes a single char', encoderFactory('char', 'e', Buffer.from([0x65, 0x00])))
+  it('correctly encodes a single int8', encoderFactory('int8', -1, Buffer.from([0xff])))
+  it('correctly encodes a single uint8', encoderFactory('uint8', 255, Buffer.from([0xff])))
+  it('correctly encodes a single int16', encoderFactory('int16', -1, Buffer.from([0xff, 0xff])))
+  it('correctly encodes a single uint16', encoderFactory('uint16', 65535, Buffer.from([0xff, 0xff])))
+  it('correctly encodes a single int32', encoderFactory('int32', -1, Buffer.from([0xff, 0xff, 0xff, 0xff])))
+  it('correctly encodes a single uint32', encoderFactory('uint32', 4294967295, Buffer.from([0xff, 0xff, 0xff, 0xff])))
+  it('correctly encodes a single float', encoderFactory('float', 12.5, Buffer.from([0x00, 0x00, 0x48, 0x41])))
   it(
     'correctly encodes a single double',
-    encoderFactory(
-      'double',
-      12.5,
-      Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40]),
-    ),
+    encoderFactory('double', 12.5, Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40])),
   )
 })
 
 describe('default array encoders', () => {
-  it(
-    'correctly encodes an array of two chars',
-    encoderFactory('char', 'ee', Buffer.from([0x65, 0x65, 0x00])),
-  )
-  it(
-    'correctly encodes an array of two int8s',
-    encoderFactory('int8', [-1, -1], Buffer.from([0xff, 0xff])),
-  )
-  it(
-    'correctly encodes an array of two uint8s',
-    encoderFactory('uint8', [255, 255], Buffer.from([0xff, 0xff])),
-  )
+  it('correctly encodes an array of two chars', encoderFactory('char', 'ee', Buffer.from([0x65, 0x65, 0x00])))
+  it('correctly encodes an array of two int8s', encoderFactory('int8', [-1, -1], Buffer.from([0xff, 0xff])))
+  it('correctly encodes an array of two uint8s', encoderFactory('uint8', [255, 255], Buffer.from([0xff, 0xff])))
   it(
     'correctly encodes an array of two int16s',
     encoderFactory('int16', [-1, -1], Buffer.from([0xff, 0xff, 0xff, 0xff])),
   )
   it(
     'correctly encodes an array of two uint16s',
-    encoderFactory(
-      'uint16',
-      [65535, 65535],
-      Buffer.from([0xff, 0xff, 0xff, 0xff]),
-    ),
+    encoderFactory('uint16', [65535, 65535], Buffer.from([0xff, 0xff, 0xff, 0xff])),
   )
   it(
     'correctly encodes an array of two int32s',
-    encoderFactory(
-      'int32',
-      [-1, -1],
-      Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]),
-    ),
+    encoderFactory('int32', [-1, -1], Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])),
   )
   it(
     'correctly encodes an array of two uint32s',
-    encoderFactory(
-      'uint32',
-      [4294967295, 4294967295],
-      Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]),
-    ),
+    encoderFactory('uint32', [4294967295, 4294967295], Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])),
   )
   it(
     'correctly encodes an array of two floats',
-    encoderFactory(
-      'float',
-      [12.5, 12.5],
-      Buffer.from([0x00, 0x00, 0x48, 0x41, 0x00, 0x00, 0x48, 0x41]),
-    ),
+    encoderFactory('float', [12.5, 12.5], Buffer.from([0x00, 0x00, 0x48, 0x41, 0x00, 0x00, 0x48, 0x41])),
   )
   it(
     'correctly encodes an array of two doubles',
     encoderFactory(
       'double',
       [12.5, 12.5],
-      Buffer.from([
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x29,
-        0x40,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x29,
-        0x40,
-      ]),
+      Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40]),
     ),
   )
 })
 
 describe('defaultDecoders', () => {
-  it(
-    'correctly decodes a single char',
-    decoderFactory('char', Buffer.from([0x65]), 'e'),
-  )
-  it(
-    'correctly decodes a single int8',
-    decoderFactory('int8', Buffer.from([0xff]), -1),
-  )
-  it(
-    'correctly decodes a single uint8',
-    decoderFactory('uint8', Buffer.from([0xff]), 255),
-  )
-  it(
-    'correctly decodes a single int16',
-    decoderFactory('int16', Buffer.from([0xff, 0xff]), -1),
-  )
-  it(
-    'correctly decodes a single uint16',
-    decoderFactory('uint16', Buffer.from([0xff, 0xff]), 65535),
-  )
-  it(
-    'correctly decodes a single int32',
-    decoderFactory('int32', Buffer.from([0xff, 0xff, 0xff, 0xff]), -1),
-  )
-  it(
-    'correctly decodes a single uint32',
-    decoderFactory('uint32', Buffer.from([0xff, 0xff, 0xff, 0xff]), 4294967295),
-  )
-  it(
-    'correctly decodes a single float',
-    decoderFactory('float', Buffer.from([0x00, 0x00, 0x48, 0x41]), 12.5),
-  )
+  it('correctly decodes a single char', decoderFactory('char', Buffer.from([0x65]), 'e'))
+  it('correctly decodes a single int8', decoderFactory('int8', Buffer.from([0xff]), -1))
+  it('correctly decodes a single uint8', decoderFactory('uint8', Buffer.from([0xff]), 255))
+  it('correctly decodes a single int16', decoderFactory('int16', Buffer.from([0xff, 0xff]), -1))
+  it('correctly decodes a single uint16', decoderFactory('uint16', Buffer.from([0xff, 0xff]), 65535))
+  it('correctly decodes a single int32', decoderFactory('int32', Buffer.from([0xff, 0xff, 0xff, 0xff]), -1))
+  it('correctly decodes a single uint32', decoderFactory('uint32', Buffer.from([0xff, 0xff, 0xff, 0xff]), 4294967295))
+  it('correctly decodes a single float', decoderFactory('float', Buffer.from([0x00, 0x00, 0x48, 0x41]), 12.5))
   it(
     'correctly decodes a single double',
-    decoderFactory(
-      'double',
-      Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40]),
-      12.5,
-    ),
+    decoderFactory('double', Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40]), 12.5),
   )
 })
 
 describe('default array decoders', () => {
-  it(
-    'correctly decodes an array of two chars',
-    decoderFactory('char', Buffer.from([0x65, 0x65]), 'ee'),
-  )
-  it(
-    'correctly decodes an array of two int8s',
-    decoderFactory('int8', Buffer.from([0xff, 0xff]), [-1, -1]),
-  )
-  it(
-    'correctly decodes an array of two uint8s',
-    decoderFactory('uint8', Buffer.from([0xff, 0xff]), [255, 255]),
-  )
+  it('correctly decodes an array of two chars', decoderFactory('char', Buffer.from([0x65, 0x65]), 'ee'))
+  it('correctly decodes an array of two int8s', decoderFactory('int8', Buffer.from([0xff, 0xff]), [-1, -1]))
+  it('correctly decodes an array of two uint8s', decoderFactory('uint8', Buffer.from([0xff, 0xff]), [255, 255]))
   it(
     'correctly decodes an array of two int16s',
     decoderFactory('int16', Buffer.from([0xff, 0xff, 0xff, 0xff]), [-1, -1]),
   )
   it(
     'correctly decodes an array of two uint16s',
-    decoderFactory('uint16', Buffer.from([0xff, 0xff, 0xff, 0xff]), [
-      65535,
-      65535,
-    ]),
+    decoderFactory('uint16', Buffer.from([0xff, 0xff, 0xff, 0xff]), [65535, 65535]),
   )
   it(
     'correctly decodes an array of two int32s',
-    decoderFactory(
-      'int32',
-      Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]),
-      [-1, -1],
-    ),
+    decoderFactory('int32', Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]), [-1, -1]),
   )
   it(
     'correctly decodes an array of two uint32s',
-    decoderFactory(
-      'uint32',
-      Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]),
-      [4294967295, 4294967295],
-    ),
+    decoderFactory('uint32', Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]), [4294967295, 4294967295]),
   )
   it(
     'correctly decodes an array of two floats',
-    decoderFactory(
-      'float',
-      Buffer.from([0x00, 0x00, 0x48, 0x41, 0x00, 0x00, 0x48, 0x41]),
-      [12.5, 12.5],
-    ),
+    decoderFactory('float', Buffer.from([0x00, 0x00, 0x48, 0x41, 0x00, 0x00, 0x48, 0x41]), [12.5, 12.5]),
   )
   it(
     'correctly decodes an array of two doubles',
     decoderFactory(
       'double',
-      Buffer.from([
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x29,
-        0x40,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x29,
-        0x40,
-      ]),
+      Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40]),
       [12.5, 12.5],
     ),
   )
