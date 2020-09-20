@@ -154,11 +154,26 @@ export class MessageIDListCodec extends Codec {
     return false
   }
 
-  encode(payload: unknown): Buffer {
-    throw new Error('Something is erroneously trying to encode a messageID list packet')
+  encode(payload: string[]): Buffer {
+    const buffers: Buffer[] = []
+
+    for (const [index, str] of payload.entries()) {
+      // push the string
+      buffers.push(Buffer.from(str))
+
+      // if we're the last entry, stop here, we don't need another delimiter
+      if (index === payload.length - 1) {
+        break
+      }
+
+      // delimit with 0x00 bytes
+      buffers.push(Buffer.from([0x00]))
+    }
+
+    return Buffer.concat(buffers)
   }
 
-  decode(payload: Buffer) {
+  decode(payload: Buffer): string[] {
     const split = splitBuffer(payload, Buffer.from([0x00]))
 
     // grab the string representations
