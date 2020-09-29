@@ -201,11 +201,7 @@ export class CallbackCodec extends Codec {
   }
 }
 
-declare interface CodecMap {
-  [key: string]: Codec
-}
-
-const defaultCodecMap: CodecMap = {
+const defaultCodecMap = {
   null: new NullCodec(),
   char: new CharCodec(),
   int8: new NumberCodec(Int8Array, TYPES.INT8),
@@ -221,5 +217,5 @@ const defaultCodecMap: CodecMap = {
   callback: new CallbackCodec(),
 }
 
-const defaultCodecList = Object.values(defaultCodecMap) as Array<Codec>
+const defaultCodecList = Object.values(defaultCodecMap)
 export { defaultCodecMap, defaultCodecList }
