@@ -185,21 +185,27 @@ export class MessageIDListCodec extends Codec {
   }
 }
 
-export class CallbackCodec extends Codec {
-  filter(message: Message): boolean {
-    return message.metadata.type === TYPES.CALLBACK
-  }
+// Callbacks don't necessarily have to have no data in them.
+// It's also the default type, so we can leave this as a hole
+// and if the later codecs don't catch it, then we'll error.
+// Additionally, if they set the callback as null, the null codec
+// will encode it correctly.
 
-  encode(payload: unknown): Buffer {
-    // Always ignore the payload when sending a callback
-    return Buffer.alloc(0)
-  }
+// export class CallbackCodec extends Codec {
+//   filter(message: Message): boolean {
+//     return message.metadata.type === TYPES.CALLBACK
+//   }
 
-  decode(payload: Buffer) {
-    // Always set the payload to null
-    return null
-  }
-}
+//   encode(payload: unknown): Buffer {
+//     // Always ignore the payload when sending a callback
+//     return Buffer.alloc(0)
+//   }
+
+//   decode(payload: Buffer) {
+//     // Always set the payload to null
+//     return null
+//   }
+// }
 
 const defaultCodecMap = {
   null: new NullCodec(),
@@ -214,7 +220,7 @@ const defaultCodecMap = {
   double: new NumberCodec(Float64Array, TYPES.DOUBLE),
   offsetMetadata: new OffsetMetadataCodec(),
   msgIdList: new MessageIDListCodec(),
-  callback: new CallbackCodec(),
+  // callback: new CallbackCodec(),
 }
 
 const defaultCodecList = Object.values(defaultCodecMap)
