@@ -1,4 +1,4 @@
-import { Codec, Message } from '@electricui/core'
+import { Codec, Message, MessageID, DeviceID } from '@electricui/core'
 import { MESSAGEIDS, TYPES } from '@electricui/protocol-binary-constants'
 
 import { splitBuffer } from './utils'
@@ -40,37 +40,65 @@ export class NullCodec extends Codec<null> {
   }
 }
 
-export class CharCodec extends Codec<string | string[]> {
+/**
+ * If the developer needs 2D arrays of strings, they need to write a custom type.
+ */
+export class CharCodec extends Codec<string> {
+  // remember how long the string is, truncate the length to the last one receive
+  private messageIDLengthCache: Map<MessageID, number> = new Map()
+
+  constructor() {
+    super()
+
+    this.getCachedStringLength = this.getCachedStringLength.bind(this)
+    this.setCachedStringLength = this.setCachedStringLength.bind(this)
+  }
+
+  getCachedStringLength(messageID: string) {
+    let stringLengthCache = this.messageIDLengthCache.get(messageID)
+
+    return stringLengthCache
+  }
+
+  setCachedStringLength(messageID: string, length: number) {
+    let stringLengthCache = this.messageIDLengthCache.set(messageID, length)
+
+    return stringLengthCache
+  }
+
   filter(message: Message): boolean {
     return message.metadata.type === TYPES.CHAR
   }
 
-  encode(payload: string | string[]): Buffer {
-    if (Array.isArray(payload)) {
-      const bufs = []
+  private nullByte = Buffer.from([0x00])
 
-      for (const string of payload) {
-        bufs.push(Buffer.from(string))
-        bufs.push(Buffer.from([0x00])) // 0x00 delimited
-      }
-      return Buffer.concat(bufs)
+  encode(payload: string, message: Message): Buffer {
+    let buffer = Buffer.concat([Buffer.from(payload), this.nullByte])
+
+    const cachedStringLength = this.getCachedStringLength(message.messageID)
+
+    if (cachedStringLength) {
+      buffer = buffer.slice(0, cachedStringLength)
     }
 
     // Null delimit the string
-    return Buffer.concat([Buffer.from(payload), Buffer.from([0x00])])
+    return buffer
   }
 
-  decode(payload: Buffer): string | string[] {
-    // if it's null terminated
-    if (payload.includes(0x00)) {
-      const split = splitBuffer(payload, Buffer.from([0x00]))
+  decode(payload: Buffer, message: Message): string {
+    let string: string
 
-      // take the buffer up until the first 0x00
-      return split[0].toString('utf8')
-    }
+    const bufferLength = payload.length
 
-    // otherwise it's just a string, pass it on as is.
-    return payload.toString('utf8')
+    // un-null-terminate it
+    const split = splitBuffer(payload, this.nullByte)
+
+    // take the buffer up until the first 0x00
+    string = split[0].toString('utf8')
+
+    this.setCachedStringLength(message.messageID, bufferLength)
+
+    return string
   }
 }
 
