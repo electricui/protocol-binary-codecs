@@ -40,6 +40,7 @@ export class NullCodec extends Codec<null> {
   }
 }
 
+const nullByte = Buffer.from([0x00])
 /**
  * If the developer needs 2D arrays of strings, they need to write a custom type.
  */
@@ -70,10 +71,8 @@ export class CharCodec extends Codec<string> {
     return message.metadata.type === TYPES.CHAR
   }
 
-  private nullByte = Buffer.from([0x00])
-
   encode(payload: string, message: Message): Buffer {
-    let buffer = Buffer.concat([Buffer.from(payload), this.nullByte])
+    let buffer = Buffer.concat([Buffer.from(payload), nullByte])
 
     const cachedStringLength = this.getCachedStringLength(message.messageID)
 
@@ -91,7 +90,7 @@ export class CharCodec extends Codec<string> {
     const bufferLength = payload.length
 
     // un-null-terminate it
-    const split = splitBuffer(payload, this.nullByte)
+    const split = splitBuffer(payload, nullByte)
 
     // take the buffer up until the first 0x00
     string = split[0].toString('utf8')
