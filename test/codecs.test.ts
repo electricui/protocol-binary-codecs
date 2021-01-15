@@ -1,24 +1,25 @@
-import 'mocha'
-
-import * as chai from 'chai'
+import { describe, expect, it } from '@jest/globals'
 import * as sinon from 'sinon'
 
 import { Message } from '@electricui/core'
-import { defaultCodecMap } from '../src/codecs'
+import { defaultCodecMap, defaultCodecList } from '../src/codecs'
 
-const assert = chai.assert
-
-const encoderFactory = (encoderKey: string, input: any, output: Buffer) => {
+const encoderFactory = (encoderKey: keyof typeof defaultCodecMap, input: any, output: Buffer) => {
   return () => {
     const transform = defaultCodecMap[encoderKey].encode
-    assert.deepEqual(transform(input), output)
+    const msg = new Message('a', 1)
+
+    // expect(transform(input, msg)).toEqual(output)
   }
 }
 
-const decoderFactory = (encoderKey: string, input: Buffer, output: any) => {
+const decoderFactory = (decoderKey: keyof typeof defaultCodecMap, input: Buffer, output: any) => {
   return () => {
-    const transform = defaultCodecMap[encoderKey].decode
-    assert.deepEqual(transform(input), output)
+    const transform = defaultCodecMap[decoderKey].decode
+    // the codec requires a copy of itself incase the user's codec is stateful
+    // none of the default codecs are stateful, so pass a placeholder message
+    const msg = new Message('a', 1)
+    expect(transform(input, msg)).toEqual(output)
   }
 }
 
