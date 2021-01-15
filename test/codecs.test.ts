@@ -9,6 +9,12 @@ const encoderFactory = (encoderKey: keyof typeof defaultCodecMap, input: any, ou
   return () => {
     const transform = defaultCodecMap[encoderKey].encode as (payload: any, message: Message<any>) => Buffer
 
+    // The codec requires a reference to the message despite passing the payload directly in case
+    // the codec relies on metadata from the message. Since none of the default codecs need this
+    // information we can just pass a placeholder message.
+
+    // The public facing API doesn't need to use this argument and can omit it from the signature,
+    // but we're using the transform functions directly.
     const msg = new Message('a', 1)
 
     expect(transform(input, msg)).toEqual(output)
@@ -18,9 +24,9 @@ const encoderFactory = (encoderKey: keyof typeof defaultCodecMap, input: any, ou
 const decoderFactory = (decoderKey: keyof typeof defaultCodecMap, input: Buffer, output: any) => {
   return () => {
     const transform = defaultCodecMap[decoderKey].decode
-    // the codec requires a copy of itself incase the user's codec is stateful
-    // none of the default codecs are stateful, so pass a placeholder message
+
     const msg = new Message('a', 1)
+
     expect(transform(input, msg)).toEqual(output)
   }
 }
