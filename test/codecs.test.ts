@@ -1,15 +1,17 @@
-import { describe, expect, it } from '@jest/globals'
 import * as sinon from 'sinon'
 
 import { Message } from '@electricui/core'
-import { defaultCodecMap, defaultCodecList } from '../src/codecs'
+import { describe, expect, it } from '@jest/globals'
+
+import { defaultCodecList, defaultCodecMap } from '../src/codecs'
 
 const encoderFactory = (encoderKey: keyof typeof defaultCodecMap, input: any, output: Buffer) => {
   return () => {
-    const transform = defaultCodecMap[encoderKey].encode
+    const transform = defaultCodecMap[encoderKey].encode as (payload: any, message: Message<any>) => Buffer
+
     const msg = new Message('a', 1)
 
-    // expect(transform(input, msg)).toEqual(output)
+    expect(transform(input, msg)).toEqual(output)
   }
 }
 
