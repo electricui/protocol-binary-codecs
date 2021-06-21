@@ -15,6 +15,8 @@ function isNumberOrArrayOfNumbers(payload: any) {
   return false
 }
 
+const nullBuffer = Buffer.alloc(0)
+
 /**
  * Handle the null case by default for all codecs.
  */
@@ -32,7 +34,7 @@ export class NullCodec extends Codec<null> {
   }
 
   encode(payload: null): Buffer {
-    return Buffer.alloc(0)
+    return nullBuffer
   }
 
   decode(message: Buffer): null {
