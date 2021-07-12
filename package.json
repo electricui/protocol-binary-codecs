@@ -39,6 +39,7 @@
     "@types/mocha": "^5.2.6",
     "@types/node": "^14.14.10",
     "@types/sinon": "^7.0.6",
+    "benny": "^3.6.15",
     "jest": "^26.6.3",
     "jest-circus": "^26.6.3",
     "nyc": "^13.3.0",
@@ -52,6 +53,7 @@
   "scripts": {
     "prepack": "silversmith prepack",
     "postpack": "silversmith postpack",
+    "bench": "ts-node ./benchmark/bench.ts",
     "build": "rm -rf ./lib && rollup -c",
     "test": "jest",
     "watch": "jest --watch"
