@@ -1,7 +1,7 @@
 import * as sinon from 'sinon'
 
 import { Message } from '@electricui/core'
-import { describe, expect, it } from '@jest/globals'
+import { describe, xdescribe, expect, it } from '@jest/globals'
 
 import { defaultCodecList, defaultCodecMap } from '../src/codecs'
 
@@ -137,48 +137,38 @@ describe('default array decoders', () => {
     decoderFactory(
       'msgIdList',
       Buffer.from([
-        0x6c,
-        0x65,
-        0x64,
-        0x00,
-        0x74,
-        0x67,
-        0x6c,
-        0x00,
-        0x62,
-        0x74,
-        0x41,
-        0x00,
-        0x62,
-        0x74,
-        0x42,
-        0x00,
-        0x75,
-        0x69,
-        0x38,
-        0x00,
-        0x69,
-        0x31,
-        0x36,
-        0x00,
-        0x69,
-        0x33,
-        0x32,
-        0x00,
-        0x66,
-        0x50,
-        0x49,
-        0x00,
-        0x75,
-        0x61,
-        0x38,
-        0x00,
-        0x69,
-        0x61,
-        0x36,
-        0x00,
+        0x6c, 0x65, 0x64, 0x00, 0x74, 0x67, 0x6c, 0x00, 0x62, 0x74, 0x41, 0x00, 0x62, 0x74, 0x42, 0x00, 0x75, 0x69,
+        0x38, 0x00, 0x69, 0x31, 0x36, 0x00, 0x69, 0x33, 0x32, 0x00, 0x66, 0x50, 0x49, 0x00, 0x75, 0x61, 0x38, 0x00,
+        0x69, 0x61, 0x36, 0x00,
       ]),
       ['led', 'tgl', 'btA', 'btB', 'ui8', 'i16', 'i32', 'fPI', 'ua8', 'ia6'],
     ),
   )
+})
+
+/**
+ * The new decoder doesn't copy, instead it creates a slice over the payload,
+ * check to make sure the codecs can deal with that
+ */
+describe('decoders with slices', () => {
+  it('correctly decodes a single char', decoderFactory('char', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0x65, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 4), 'e')) // prettier-ignore
+  it('correctly decodes two chars', decoderFactory('char', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0x65, 0x65, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 5), 'ee')) // prettier-ignore
+
+  it('correctly decodes a single int8', decoderFactory('int8', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 4), -1)) // prettier-ignore
+  it('correctly decodes a single uint8', decoderFactory('uint8', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 4), 255)) // prettier-ignore
+  it('correctly decodes a single int16', decoderFactory('int16', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 5), -1)) // prettier-ignore
+  it('correctly decodes a single uint16', decoderFactory('uint16', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 5), 65535)) // prettier-ignore
+  it('correctly decodes a single int32', decoderFactory('int32', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 7), -1)) // prettier-ignore
+  it('correctly decodes a single uint32', decoderFactory('uint32', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 7), 4294967295)) // prettier-ignore
+  it('correctly decodes a single float', decoderFactory('float', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0x00, 0x00, 0x48, 0x41, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 7), 12.5)) // prettier-ignore
+  it('correctly decodes a single double', decoderFactory('double', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 11), 12.5)) // prettier-ignore
+
+  it('correctly decodes two int8s', decoderFactory('int8', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 5), [-1, -1])) // prettier-ignore
+  it('correctly decodes two uint8s', decoderFactory('uint8', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 5), [255, 255])) // prettier-ignore
+  it('correctly decodes two int16s', decoderFactory('int16', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 7), [-1, -1])) // prettier-ignore
+  it('correctly decodes two uint16s', decoderFactory('uint16', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 7), [65535, 65535])) // prettier-ignore
+  it('correctly decodes two int32s', decoderFactory('int32', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 11), [-1, -1])) // prettier-ignore
+  it('correctly decodes two uint32s', decoderFactory('uint32', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 11), [4294967295, 4294967295])) // prettier-ignore
+  it('correctly decodes two floats', decoderFactory('float', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0x00, 0x00, 0x48, 0x41, 0x00, 0x00, 0x48, 0x41, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 11), [12.5, 12.5])) // prettier-ignore
+  it('correctly decodes two doubles', decoderFactory('double', Buffer.from([0x00, 0x00, 0x00, /* start actual payload */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x40, /* end payload */ 0x00, 0x00, 0x00]).slice(3, 19), [12.5, 12.5])) // prettier-ignore
 })
