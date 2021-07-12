@@ -114,7 +114,20 @@ type TypedArrayConstructor =
   | Float64ArrayConstructor
 
 export class NumberCodec extends Codec {
-  constructor(private factory: TypedArrayConstructor, private type: TYPES) {
+  constructor(
+    private factory: TypedArrayConstructor,
+    private type: TYPES,
+    private dataViewAccessor:
+      | 'getInt8'
+      | 'getUint8'
+      | 'getInt16'
+      | 'getUint16'
+      | 'getInt32'
+      | 'getUint32'
+      | 'getFloat32'
+      | 'getFloat64',
+    private littleEndian?: boolean,
+  ) {
     super()
   }
 
@@ -132,15 +145,23 @@ export class NumberCodec extends Codec {
   }
 
   decode(payload: Buffer): number | number[] {
-    const arr: number[] = Array.from(
-      new this.factory(
-        payload.buffer,
-        payload.byteOffset,
-        payload.byteLength / this.factory.BYTES_PER_ELEMENT,
-      ).values(),
-    )
+    const arrLength = payload.byteLength / this.factory.BYTES_PER_ELEMENT
 
-    return arr.length === 1 ? arr[0] : arr
+    const dataView = new DataView(payload.buffer, payload.byteOffset, payload.byteLength)
+
+    // If there is only one, just return it
+    if (arrLength === 1) {
+      return dataView[this.dataViewAccessor](0, this.littleEndian)
+    }
+
+    // Allocate the array
+    const array = new Array(arrLength)
+
+    // Populate it
+    for (let index = 0; index < arrLength; index++) {
+      array[index] = dataView[this.dataViewAccessor](this.factory.BYTES_PER_ELEMENT * index, this.littleEndian)
+    }
+    return array
   }
 }
 
@@ -155,17 +176,19 @@ export class OffsetMetadataCodec extends Codec {
   }
 
   encode(payload: OffsetMetadataPayload): Buffer {
-    return Buffer.from(Uint16Array.from([payload.start, payload.end]).buffer)
+    const buffer = Buffer.allocUnsafe(4)
+    buffer.writeUInt16LE(payload.start, 0)
+    buffer.writeUInt16LE(payload.end, 2)
+
+    return buffer
   }
 
   decode(payload: Buffer): OffsetMetadataPayload {
-    const arr = Array.from(
-      new Uint16Array(payload.buffer, payload.byteOffset, payload.byteLength / Uint16Array.BYTES_PER_ELEMENT).values(),
-    )
+    const dataView = new DataView(payload.buffer, payload.byteOffset, payload.byteLength)
 
     return {
-      start: arr[0],
-      end: arr[1],
+      start: dataView.getUint16(0),
+      end: dataView.getUint16(2),
     }
   }
 }
@@ -239,14 +262,14 @@ export class MessageIDListCodec extends Codec {
 const defaultCodecMap = {
   null: new NullCodec(),
   char: new CharCodec(),
-  int8: new NumberCodec(Int8Array, TYPES.INT8),
-  uint8: new NumberCodec(Uint8Array, TYPES.UINT8),
-  int16: new NumberCodec(Int16Array, TYPES.INT16),
-  uint16: new NumberCodec(Uint16Array, TYPES.UINT16),
-  int32: new NumberCodec(Int32Array, TYPES.INT32),
-  uint32: new NumberCodec(Uint32Array, TYPES.UINT32),
-  float: new NumberCodec(Float32Array, TYPES.FLOAT),
-  double: new NumberCodec(Float64Array, TYPES.DOUBLE),
+  int8: new NumberCodec(Int8Array, TYPES.INT8, 'getInt8'),
+  uint8: new NumberCodec(Uint8Array, TYPES.UINT8, 'getUint8', true),
+  int16: new NumberCodec(Int16Array, TYPES.INT16, 'getInt16', true),
+  uint16: new NumberCodec(Uint16Array, TYPES.UINT16, 'getUint16', true),
+  int32: new NumberCodec(Int32Array, TYPES.INT32, 'getInt32', true),
+  uint32: new NumberCodec(Uint32Array, TYPES.UINT32, 'getUint32', true),
+  float: new NumberCodec(Float32Array, TYPES.FLOAT, 'getFloat32', true),
+  double: new NumberCodec(Float64Array, TYPES.DOUBLE, 'getFloat64', true),
   offsetMetadata: new OffsetMetadataCodec(),
   msgIdList: new MessageIDListCodec(),
   // callback: new CallbackCodec(),
