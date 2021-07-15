@@ -83,7 +83,7 @@ export const numberDecodingBench = b.suite(
         const payload = numbers[index]
 
         const arrLength = payload.byteLength / factory.BYTES_PER_ELEMENT
-        const dataView = new DataView(payload.buffer, payload.byteOffset, payload.byteLength) as any
+        const dataView = new DataView(payload.buffer, payload.byteOffset, payload.byteLength)
         const key = 'uint8'
 
         dataView[factoryLookups[key]](0)
@@ -99,6 +99,26 @@ export const numberDecodingBench = b.suite(
         const payload = numbers[index]
 
         codec.decode(payload)
+      }
+    }
+  }),
+
+  b.add('uint8-1k-decode-old-codec', () => {
+    const codec = defaultCodecMap.uint8
+
+    return () => {
+      for (let index = 0; index < numbers.length; index++) {
+        const payload = numbers[index]
+
+        const array = Array.from(
+          new Uint8Array(
+            payload.buffer,
+            payload.byteOffset,
+            payload.byteLength / Uint8Array.BYTES_PER_ELEMENT,
+          ).values(),
+        )
+
+        const singular = array[0]
       }
     }
   }),
