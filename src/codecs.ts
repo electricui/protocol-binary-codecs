@@ -187,8 +187,8 @@ export class OffsetMetadataCodec extends Codec {
     const dataView = new DataView(payload.buffer, payload.byteOffset, payload.byteLength)
 
     return {
-      start: dataView.getUint16(0),
-      end: dataView.getUint16(2),
+      start: dataView.getUint16(0, true), // They're LE uint16s
+      end: dataView.getUint16(2, true),
     }
   }
 }
