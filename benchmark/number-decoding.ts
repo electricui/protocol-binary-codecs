@@ -76,7 +76,7 @@ export const numberDecodingBench = b.suite(
     const factory: any = Uint8Array
     const factoryLookups = {
       uint8: 'getUint8',
-    }
+    } as const
 
     return () => {
       for (let index = 0; index < numbers.length; index++) {
