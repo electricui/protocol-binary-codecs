@@ -1,4 +1,4 @@
-import { Codec, Message, MessageID, DeviceID } from '@electricui/core'
+import { Codec, Message, MessageID, CodecDuplexPipeline, CodecPipelineOptions } from '@electricui/core'
 import { MESSAGEIDS, TYPES } from '@electricui/protocol-binary-constants'
 
 import { splitBuffer } from './utils'
@@ -276,4 +276,12 @@ const defaultCodecMap = {
 }
 
 const defaultCodecList = Object.values(defaultCodecMap)
-export { defaultCodecMap, defaultCodecList }
+
+class CodecDuplexPipelineWithDefaults extends CodecDuplexPipeline {
+  constructor(options?: CodecPipelineOptions) {
+    super(options)
+    this.addCodecs(defaultCodecList)
+  }
+}
+
+export { defaultCodecMap, defaultCodecList, CodecDuplexPipelineWithDefaults }
