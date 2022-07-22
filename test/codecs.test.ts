@@ -1,5 +1,3 @@
-import * as sinon from 'sinon'
-
 import { Message } from '@electricui/core'
 import { describe, xdescribe, expect, it } from '@jest/globals'
 
