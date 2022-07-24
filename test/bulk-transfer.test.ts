@@ -5,7 +5,6 @@ import { SmartBuffer } from 'smart-buffer'
 import { describe, xdescribe, expect, it } from '@jest/globals'
 
 import { HardwareMessageRetimer, HardwareTimeBasis } from '../src/retiming'
-import { TYPES } from '@electricui/protocol-binary-constants'
 
 /**
  * // Packet for sequential ADC data
@@ -47,7 +46,7 @@ function encode(payload: BulkTransferMessage): Buffer {
   return buf.toBuffer()
 }
 
-const sharedTimeBasis = new HardwareTimeBasis(TYPES.UINT32)
+const sharedTimeBasis = new HardwareTimeBasis(32)
 
 export class BulkTransferCodec extends Codec<BulkTransferMessage> {
   filter(message: Message): boolean {
@@ -71,12 +70,11 @@ export class BulkTransferCodec extends Codec<BulkTransferMessage> {
     const timestamp = reader.readUInt32LE()
 
     const offsetTimestamp = this.retimer.exchange(timestamp)
+    const initial = reader.readUInt16LE()
 
-    const start = reader.readUInt16LE()
+    let current = initial
 
-    let current = start
-
-    let values: number[] = [current]
+    const values: number[] = [current]
 
     for (let index = 0; index < BULK_BUFFER_SIZE - 1; index++) {
       const offset = reader.readInt8()
@@ -110,7 +108,7 @@ function decode(codec: BulkTransferCodec, payload: BulkTransferMessage) {
 
 describe('bulk transfer example', () => {
   it('correctly encodes and decodes a buffer of numbers', () => {
-    const codec = new BulkTransferCodec(new HardwareTimeBasis(TYPES.UINT32))
+    const codec = new BulkTransferCodec(new HardwareTimeBasis(32))
 
     const payload: BulkTransferMessage = {
       timestamp: 0,
@@ -123,7 +121,7 @@ describe('bulk transfer example', () => {
   })
 
   it("the initial packet is received 'now' establishing a time origin for the hardware", () => {
-    const codec = new BulkTransferCodec(new HardwareTimeBasis(TYPES.UINT32))
+    const codec = new BulkTransferCodec(new HardwareTimeBasis(32))
 
     // Set the UI time to 10
     timing.now = () => 10
@@ -138,7 +136,7 @@ describe('bulk transfer example', () => {
   })
 
   it("subsequent packets are timed based on the hardware's time", () => {
-    const codec = new BulkTransferCodec(new HardwareTimeBasis(TYPES.UINT32))
+    const codec = new BulkTransferCodec(new HardwareTimeBasis(32))
 
     // Set the UI time to 10
     timing.now = () => 0

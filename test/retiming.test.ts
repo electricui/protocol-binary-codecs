@@ -1,7 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 
 import { HardwareMessageRetimer, HardwareTimeBasis } from '../src/retiming'
-import { TYPES } from '@electricui/protocol-binary-constants'
 
 export interface BulkTransferMessage {
   values: number[]
@@ -15,7 +14,7 @@ const timing = {
 
 describe('retiming', () => {
   it("the initial packet is received 'now' establishing a time origin for the hardware (pos time)", () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT8)
+    const timeBasis = new HardwareTimeBasis(8)
     const retimer = new HardwareMessageRetimer(timeBasis, {}, timing)
 
     // Set the UI time to 10
@@ -26,7 +25,7 @@ describe('retiming', () => {
     expect(retimed).toBe(10)
   })
   it("the initial packet is received 'now' establishing a time origin for the hardware (neg time)", () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT8)
+    const timeBasis = new HardwareTimeBasis(8)
     const retimer = new HardwareMessageRetimer(timeBasis, {}, timing)
 
     // Set the UI time to -10
@@ -37,7 +36,7 @@ describe('retiming', () => {
     expect(retimed).toBe(-10)
   })
   it('small timing jitter from the UI is ignored, falling to hardware', () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT8)
+    const timeBasis = new HardwareTimeBasis(8)
     const retimer = new HardwareMessageRetimer(timeBasis, {}, timing)
 
     // Set the UI time to 10
@@ -56,7 +55,7 @@ describe('retiming', () => {
     expect(retimed2).toBe(20)
   })
   it('large timing jitter from the UI causes a retiming event', () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT8)
+    const timeBasis = new HardwareTimeBasis(8)
     const retimer = new HardwareMessageRetimer(
       timeBasis,
       {
@@ -80,7 +79,7 @@ describe('retiming', () => {
     expect(retimed2).toBe(100)
   })
   it('the size of jitter acceptable is configurable', () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT8)
+    const timeBasis = new HardwareTimeBasis(8)
     const retimer = new HardwareMessageRetimer(
       timeBasis,
       {
@@ -105,7 +104,7 @@ describe('retiming', () => {
   })
 
   it('correctly overflows a uint8', () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT8)
+    const timeBasis = new HardwareTimeBasis(8)
     const retimer = new HardwareMessageRetimer(timeBasis, {}, timing)
 
     const overflowable = new Uint8Array(1)
@@ -132,7 +131,7 @@ describe('retiming', () => {
   })
 
   it('correctly overflows a uint16', () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT16)
+    const timeBasis = new HardwareTimeBasis(16)
     const retimer = new HardwareMessageRetimer(timeBasis, {}, timing)
 
     const overflowable = new Uint16Array(1)
@@ -159,7 +158,7 @@ describe('retiming', () => {
   })
 
   it('correctly overflows a uint32', () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT32)
+    const timeBasis = new HardwareTimeBasis(32)
     const retimer = new HardwareMessageRetimer(timeBasis, {}, timing)
 
     const overflowable = new Uint32Array(1)
@@ -185,7 +184,7 @@ describe('retiming', () => {
     expect(retimer.exchange(overflowable[0])).toBe(6294967000)
   })
   it('multiple codecs can use the same hardware time basis', () => {
-    const timeBasis = new HardwareTimeBasis(TYPES.UINT8)
+    const timeBasis = new HardwareTimeBasis(8)
     const retimer1 = new HardwareMessageRetimer(timeBasis, {}, timing)
     const retimer2 = new HardwareMessageRetimer(timeBasis, {}, timing)
 
