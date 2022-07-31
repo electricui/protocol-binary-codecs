@@ -1,6 +1,6 @@
 {
   "name": "@electricui/protocol-binary-codecs",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "ElectricUI Binary Protocol Codecs",
   "electricui-dev": true,
   "author": "Electric UI <support@electricui.com> (https://electricui.com)",
