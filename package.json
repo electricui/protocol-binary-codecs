@@ -57,7 +57,7 @@
     "postpack": "silversmith postpack",
     "bench": "ts-node ./benchmark/bench.ts",
     "build": "rm -rf ./lib && rollup -c",
-    "test": "jest",
+    "test": "jest --runInBand",
     "watch": "jest --watch"
   }
 }
